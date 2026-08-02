@@ -1,0 +1,32 @@
+/* Excel-like column resize / autofit for Django Admin changelist tables */
+
+#result_list {
+    table-layout: auto;
+}
+
+#result_list thead th {
+    position: relative;
+    white-space: nowrap;
+}
+
+#result_list thead th .col-resize-handle {
+    position: absolute;
+    top: 0;
+    right: -3px;
+    width: 7px;
+    height: 100%;
+    cursor: col-resize;
+    user-select: none;
+    z-index: 2;
+}
+
+#result_list thead th .col-resize-handle:hover,
+#result_list thead th .col-resize-handle.is-active {
+    background: rgba(65, 118, 144, 0.35);
+}
+
+#result_list td,
+#result_list th {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

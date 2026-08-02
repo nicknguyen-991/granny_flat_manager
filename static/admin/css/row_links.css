@@ -1,0 +1,47 @@
+/* Whole-row click target + hyperlink style for the entire row on hover */
+
+#result_list tbody tr {
+    cursor: pointer;
+}
+
+#result_list tbody tr:hover {
+    background-color: var(--darkened-bg, #f8f8f8);
+}
+
+/* Default: first-column links look like plain text (same as other cells) */
+#result_list tbody tr a {
+    color: inherit;
+    text-decoration: none;
+}
+
+/*
+ * On row hover: apply hyperlink look to the WHOLE row
+ * (all cells), not only the first-column <a>.
+ */
+#result_list tbody tr:hover th,
+#result_list tbody tr:hover td {
+    color: var(--link-fg, #447e9b);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+#result_list tbody tr:hover a {
+    color: var(--link-fg, #447e9b);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+/* Keep action checkbox column looking normal (not underlined as a link) */
+#result_list tbody tr:hover .action-checkbox,
+#result_list tbody tr:hover .action-checkbox-column,
+#result_list tbody tr:hover th.action-checkbox-column,
+#result_list tbody tr:hover td.action-checkbox-column {
+    color: inherit;
+    text-decoration: none;
+}
+
+#result_list tbody tr .action-checkbox,
+#result_list tbody tr input,
+#result_list tbody tr button {
+    cursor: default;
+}
