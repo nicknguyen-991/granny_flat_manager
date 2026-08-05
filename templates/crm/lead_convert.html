@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Convert to Client — Granny Flat Manager{% endblock %}
+
+{% block content %}
+<p class="breadcrumb">
+  <a href="{% url 'crm:lead_list' %}">Leads</a>
+  / <a href="{% url 'crm:lead_detail' lead.pk %}">{{ lead.first_name }} {{ lead.last_name }}</a>
+  / Convert to Client
+</p>
+
+<section class="page-header">
+  <h1>Convert to Client</h1>
+  <p class="subtitle">Create a client record from this won lead. Contact details will be copied automatically.</p>
+</section>
+
+<section class="card preview-card">
+  <h2>From Lead</h2>
+  <dl class="detail-list">
+    <dt>Name</dt>
+    <dd>{{ lead.first_name }} {{ lead.last_name }}</dd>
+    <dt>Email</dt>
+    <dd>{{ lead.email|default:"—" }}</dd>
+    <dt>Phone / Mobile</dt>
+    <dd>{{ lead.phone|default:"—" }} / {{ lead.mobile|default:"—" }}</dd>
+  </dl>
+</section>
+
+<form method="post" class="form-card">
+  {% csrf_token %}
+
+  {% if form.non_field_errors %}
+    <div class="form-errors">{{ form.non_field_errors }}</div>
+  {% endif %}
+
+  <div class="form-field {% if form.site_address.errors %}has-error{% endif %}">
+    <label for="{{ form.site_address.id_for_label }}">Site Address</label>
+    {{ form.site_address }}
+    {% if form.site_address.errors %}
+      <span class="field-error">{{ form.site_address.errors.0 }}</span>
+    {% endif %}
+    <span class="field-help">Where the Granny Flat will be built (required for client record).</span>
+  </div>
+
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary">Create Client</button>
+    <a class="btn btn-ghost" href="{% url 'crm:lead_detail' lead.pk %}">Cancel</a>
+  </div>
+</form>
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}{{ lead.first_name }} {{ lead.last_name }} — Granny Flat Manager{% endblock %}
+
+{% block content %}
+<p class="breadcrumb"><a href="{% url 'crm:lead_list' %}">Leads</a> / {{ lead.first_name }} {{ lead.last_name }}</p>
+
+<section class="page-header">
+  <div>
+    <h1>{{ lead.first_name }} {{ lead.last_name }}</h1>
+    <p class="subtitle">
+      <span class="badge badge-{{ lead.status }}">{{ lead.get_status_display }}</span>
+      · Created {{ lead.created_at|date:"d M Y, g:i a" }}
+    </p>
+  </div>
+  <div class="btn-group">
+    <a class="btn" href="{% url 'crm:lead_edit' lead.pk %}">Edit</a>
+    {% if can_convert %}
+      <a class="btn btn-primary" href="{% url 'crm:lead_convert' lead.pk %}">Convert to Client</a>
+    {% endif %}
+  </div>
+</section>
+
+<div class="detail-grid">
+  <section class="card">
+    <h2>Contact</h2>
+    <dl class="detail-list">
+      <dt>Email</dt>
+      <dd>{{ lead.email|default:"—" }}</dd>
+      <dt>Phone</dt>
+      <dd>{{ lead.phone|default:"—" }}</dd>
+      <dt>Mobile</dt>
+      <dd>{{ lead.mobile|default:"—" }}</dd>
+    </dl>
+  </section>
+
+  <section class="card">
+    <h2>Sales</h2>
+    <dl class="detail-list">
+      <dt>Lead Source</dt>
+      <dd>{{ lead.get_source_display|default:"—" }}</dd>
+      <dt>Assigned Sales Rep</dt>
+      <dd>
+        {% if lead.assigned_sales %}
+          {{ lead.assigned_sales.first_name }} {{ lead.assigned_sales.last_name }}
+        {% else %}
+          —
+        {% endif %}
+      </dd>
+      <dt>Status</dt>
+      <dd><span class="badge badge-{{ lead.status }}">{{ lead.get_status_display }}</span></dd>
+    </dl>
+  </section>
+</div>
+
+{% if lead.notes %}
+  <section class="card">
+    <h2>Notes</h2>
+    <p class="notes">{{ lead.notes|linebreaksbr }}</p>
+  </section>
+{% endif %}
+
+{% if clients %}
+  <section class="card">
+    <h2>Linked Clients</h2>
+    <ul class="linked-list">
+      {% for client in clients %}
+        <li>
+          {{ client.first_name }} {{ client.last_name }}
+          — {{ client.site_address|truncatechars:60 }}
+          <a href="/admin/crm/client/{{ client.pk }}/change/" target="_blank" rel="noopener">View in Admin</a>
+        </li>
+      {% endfor %}
+    </ul>
+  </section>
+{% endif %}
+{% endblock %}

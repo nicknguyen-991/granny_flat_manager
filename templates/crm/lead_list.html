@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Leads — Granny Flat Manager{% endblock %}
+
+{% block content %}
+<section class="page-header">
+  <div>
+    <h1>Leads</h1>
+    <p class="subtitle">{{ total_count }} total lead{{ total_count|pluralize }}</p>
+  </div>
+  <a class="btn btn-primary" href="{% url 'crm:lead_create' %}">+ New Lead</a>
+</section>
+
+<form class="filters" method="get" action="{% url 'crm:lead_list' %}">
+  <div class="status-tabs">
+    <a href="{% url 'crm:lead_list' %}{% if search_query %}?q={{ search_query|urlencode }}{% endif %}"
+       class="status-tab {% if not status_filter %}active{% endif %}">
+      All <span class="count">{{ total_count }}</span>
+    </a>
+    {% for tab in status_tabs %}
+      <a href="?status={{ tab.value }}{% if search_query %}&q={{ search_query|urlencode }}{% endif %}"
+         class="status-tab status-{{ tab.value }} {% if status_filter == tab.value %}active{% endif %}">
+        {{ tab.label }} <span class="count">{{ tab.count }}</span>
+      </a>
+    {% endfor %}
+  </div>
+
+  <div class="search-row">
+    <input type="search" name="q" value="{{ search_query }}" placeholder="Search name, email, phone…">
+    {% if status_filter %}
+      <input type="hidden" name="status" value="{{ status_filter }}">
+    {% endif %}
+    <button type="submit" class="btn">Search</button>
+    {% if search_query or status_filter %}
+      <a class="btn btn-ghost" href="{% url 'crm:lead_list' %}">Clear</a>
+    {% endif %}
+  </div>
+</form>
+
+{% if leads %}
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Status</th>
+          <th>Lead Source</th>
+          <th>Phone</th>
+          <th>Mobile</th>
+          <th>Sales Rep</th>
+          <th>Created</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for lead in leads %}
+          <tr class="clickable-row" onclick="window.location='{% url 'crm:lead_detail' lead.pk %}'">
+            <td><strong>{{ lead.first_name }} {{ lead.last_name }}</strong></td>
+            <td><span class="badge badge-{{ lead.status }}">{{ lead.get_status_display }}</span></td>
+            <td>{{ lead.get_source_display|default:"—" }}</td>
+            <td>{{ lead.phone|default:"—" }}</td>
+            <td>{{ lead.mobile|default:"—" }}</td>
+            <td>
+              {% if lead.assigned_sales %}
+                {{ lead.assigned_sales.first_name }} {{ lead.assigned_sales.last_name }}
+              {% else %}
+                —
+              {% endif %}
+            </td>
+            <td>{{ lead.created_at|date:"d M Y" }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% else %}
+  <div class="empty-state">
+    <p>No leads found{% if status_filter or search_query %} matching your filters{% endif %}.</p>
+    <a class="btn btn-primary" href="{% url 'crm:lead_create' %}">Create your first lead</a>
+  </div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,33 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Granny Flat Manager{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="{% url 'crm:lead_list' %}">Granny Flat Manager</a>
+      <nav class="main-nav">
+        <a href="{% url 'crm:lead_list' %}" class="{% if request.resolver_match.url_name == 'lead_list' %}active{% endif %}">Leads</a>
+        <a href="/admin/" target="_blank" rel="noopener">Admin</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container main-content">
+    {% if messages %}
+      <ul class="messages">
+        {% for message in messages %}
+          <li class="message message-{{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>
