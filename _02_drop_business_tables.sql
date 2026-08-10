@@ -2,7 +2,8 @@
 -- Reset business tables created by granny-flat-schema.sql
 -- so Django migrations can recreate them cleanly.
 --
--- Run this ONCE in pgAdmin (Query Tool) on database: granny_flat_manager
+-- Run this ONCE in pgAdmin (Query Tool) on your PostgreSQL database
+-- (the name in POSTGRES_DB inside .env, e.g. granny_flat)
 -- BEFORE: python manage.py migrate
 --
 -- Safe for Phase 1 learning data (drops business tables only).
