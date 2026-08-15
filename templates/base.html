@@ -16,6 +16,7 @@
         <a href="{% url 'crm:lead_pipeline' %}" class="{% if request.resolver_match.url_name == 'lead_pipeline' %}active{% endif %}">Pipeline</a>
         <a href="{% url 'crm:client_list' %}" class="{% if 'client' in request.resolver_match.url_name %}active{% endif %}">Clients</a>
         <a href="{% url 'construction:project_list' %}" class="{% if 'project' in request.resolver_match.url_name %}active{% endif %}">Projects</a>
+        <a href="{% url 'reporting:dashboard' %}" class="{% if request.resolver_match.app_name == 'reporting' %}active{% endif %}">Reports</a>
         <a href="/admin/" target="_blank" rel="noopener">Admin</a>
       </nav>
     </div>

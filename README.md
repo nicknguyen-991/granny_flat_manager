@@ -136,6 +136,7 @@ Then open in your browser:
 | [http://127.0.0.1:8000/leads/pipeline/](http://127.0.0.1:8000/leads/pipeline/) | CRM — Sales pipeline (Kanban) |
 | [http://127.0.0.1:8000/clients/](http://127.0.0.1:8000/clients/) | CRM — Client list |
 | [http://127.0.0.1:8000/projects/](http://127.0.0.1:8000/projects/) | Construction — Project list |
+| [http://127.0.0.1:8000/reports/](http://127.0.0.1:8000/reports/) | Reporting dashboard |
 | [http://127.0.0.1:8000/admin/](http://127.0.0.1:8000/admin/) | Django Admin |
 
 Press `Ctrl+C` in the terminal to stop the server.
@@ -144,7 +145,7 @@ Press `Ctrl+C` in the terminal to stop the server.
 
 ## Roadmap
 
-**Current status:** Phases 0–3 are complete. Next up is **Phase 4 — Reporting dashboard**.
+**Current status:** Phases 0–4 are complete. Next up is **Phase 5 — Deploy**.
 
 ### Phase 0 — Design & database ✅
 
@@ -176,14 +177,14 @@ Press `Ctrl+C` in the terminal to stop the server.
 - [x] Assign partners to projects
 - [x] Site updates (notes / photos)
 
-### Phase 4 — Reporting dashboard 🔄 Next
+### Phase 4 — Reporting dashboard ✅
 
-- [ ] Lead conversion by sales rep
-- [ ] Jobs in progress
-- [ ] Revenue overview
-- [ ] Commission summary
+- [x] Lead conversion by sales rep
+- [x] Jobs in progress
+- [x] Revenue overview
+- [x] Commission summary
 
-### Phase 5 — Deploy ⬜ Planned
+### Phase 5 — Deploy 🔄 Next
 
 - [ ] Host on Railway or Render
 - [ ] Production PostgreSQL
