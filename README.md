@@ -137,6 +137,7 @@ Then open in your browser:
 | [http://127.0.0.1:8000/clients/](http://127.0.0.1:8000/clients/) | CRM — Client list |
 | [http://127.0.0.1:8000/projects/](http://127.0.0.1:8000/projects/) | Construction — Project list |
 | [http://127.0.0.1:8000/reports/](http://127.0.0.1:8000/reports/) | Reporting dashboard |
+| [http://127.0.0.1:8000/health/](http://127.0.0.1:8000/health/) | Deploy smoke test (`{"status": "ok"}`) |
 | [http://127.0.0.1:8000/admin/](http://127.0.0.1:8000/admin/) | Django Admin |
 
 Press `Ctrl+C` in the terminal to stop the server.
@@ -145,7 +146,7 @@ Press `Ctrl+C` in the terminal to stop the server.
 
 ## Roadmap
 
-**Current status:** Phases 0–4 are complete. Next up is **Phase 5 — Deploy**.
+**Current status:** Phases 0–5 are complete. The app is ready to host on Render or Railway.
 
 ### Phase 0 — Design & database ✅
 
@@ -184,11 +185,11 @@ Press `Ctrl+C` in the terminal to stop the server.
 - [x] Revenue overview
 - [x] Commission summary
 
-### Phase 5 — Deploy 🔄 Next
+### Phase 5 — Deploy ✅
 
-- [ ] Host on Railway or Render
-- [ ] Production PostgreSQL
-- [ ] Environment variables and smoke tests
+- [x] Host on Railway or Render (production config + deploy guide)
+- [x] Production PostgreSQL (`DATABASE_URL`)
+- [x] Environment variables and smoke tests (`/health/`)
 
 ---
 
@@ -206,6 +207,68 @@ Press `Ctrl+C` in the terminal to stop the server.
 | `project_partners` | Project ↔ partner assignments |
 | `project_updates` | Site diary entries |
 | `commissions` | Sales commissions |
+
+---
+
+## Deploy (Phase 5)
+
+The app is production-ready: **Gunicorn**, **WhiteNoise** (static files), and **PostgreSQL via `DATABASE_URL`**.
+
+Create a **superuser after the first deploy**:
+
+```powershell
+python manage.py createsuperuser
+```
+
+On Render / Railway, use their shell / one-off command instead of running this locally.
+
+### Environment variables (production)
+
+| Variable | Example | Notes |
+|----------|---------|-------|
+| `DJANGO_SECRET_KEY` | long random string | Required |
+| `DJANGO_DEBUG` | `False` | Never leave `True` online |
+| `DJANGO_ALLOWED_HOSTS` | `your-app.onrender.com` | Comma-separated hosts |
+| `DJANGO_CSRF_TRUSTED_ORIGINS` | `https://your-app.onrender.com` | Must include `https://` |
+| `DATABASE_URL` | `postgres://...` | Provided by the host's Postgres add-on |
+
+### Option A — Render (recommended for first deploy)
+
+1. Push this repo to GitHub.
+2. In [Render](https://render.com), create a **Web Service** from the repo.
+3. Add a **PostgreSQL** database and copy its **Internal Database URL** into `DATABASE_URL`.
+4. Set the env vars in the table above (`DJANGO_ALLOWED_HOSTS` = your `*.onrender.com` hostname).
+5. Build command:
+
+   ```text
+   pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate --noinput
+   ```
+
+6. Start command:
+
+   ```text
+   gunicorn config.wsgi:application
+   ```
+
+7. Smoke test: open `https://YOUR-APP.onrender.com/health/` — you should see `{"status": "ok"}`.
+8. Then open `/admin/` and `/leads/`.
+
+`render.yaml` in the repo can also be used with **Render Blueprint**.
+
+### Option B — Railway
+
+1. In [Railway](https://railway.app), **New Project → Deploy from GitHub**.
+2. Add a **PostgreSQL** plugin (Railway sets `DATABASE_URL`).
+3. Set `DJANGO_DEBUG=False`, `DJANGO_SECRET_KEY`, `DJANGO_ALLOWED_HOSTS`, and `DJANGO_CSRF_TRUSTED_ORIGINS`.
+4. Railway will use the `Procfile` (`gunicorn` + migrate on release).
+5. Smoke test `/health/`, then `/admin/` and `/leads/`.
+
+### Local production check
+
+```powershell
+python manage.py check --deploy
+python manage.py collectstatic --noinput
+```
 
 ---
 

@@ -20,9 +20,11 @@ from django.views.generic import RedirectView
 
 # Apply custom Admin sidebar ordering (CRM: Leads, Clients, Commissions)
 from config import admin_ordering  # noqa: F401
+from config.health import health
 
 urlpatterns = [
     path('', RedirectView.as_view(pattern_name='crm:lead_list', permanent=False)),
+    path('health/', health, name='health'),
     path('admin/', admin.site.urls),
     path('', include('crm.urls')),
     path('', include('construction.urls')),
