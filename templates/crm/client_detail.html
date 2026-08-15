@@ -63,9 +63,9 @@
         </thead>
         <tbody>
           {% for project in projects %}
-            <tr>
-              <td>#{{ project.pk }}</td>
-              <td><span class="badge">{{ project.get_status_display }}</span></td>
+            <tr class="clickable-row" onclick="window.location='{% url 'construction:project_detail' project.pk %}'">
+              <td><a href="{% url 'construction:project_detail' project.pk %}" onclick="event.stopPropagation()">#{{ project.pk }}</a></td>
+              <td><span class="badge badge-{{ project.status }}">{{ project.get_status_display }}</span></td>
               <td>{% if project.contract_value %}${{ project.contract_value }}{% else %}—{% endif %}</td>
               <td>
                 {% if project.sales_rep %}
@@ -80,9 +80,8 @@
         </tbody>
       </table>
     </div>
-    <p class="field-help">Manage projects in <a href="/admin/construction/project/" target="_blank" rel="noopener">Admin</a> until Phase 3 pages are built.</p>
   {% else %}
-    <p class="notes">No projects yet for this client.</p>
+    <p class="notes">No projects yet for this client. <a href="{% url 'construction:project_create' %}">Create a project</a>.</p>
   {% endif %}
 </section>
 {% endblock %}

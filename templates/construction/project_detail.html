@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+
+{% block title %}Project #{{ project.pk }} — Granny Flat Manager{% endblock %}
+
+{% block content %}
+<p class="breadcrumb">
+  <a href="{% url 'construction:project_list' %}">Projects</a>
+  / Project #{{ project.pk }}
+</p>
+
+<section class="page-header">
+  <div>
+    <h1>Project #{{ project.pk }}</h1>
+    <p class="subtitle">
+      <span class="badge badge-{{ project.status }}">{{ project.get_status_display }}</span>
+      · {{ project.client.first_name }} {{ project.client.last_name }}
+    </p>
+  </div>
+  <div class="btn-group">
+    <a class="btn" href="{% url 'construction:project_edit' project.pk %}">Edit</a>
+  </div>
+</section>
+
+<div class="detail-grid">
+  <section class="card">
+    <h2>Client</h2>
+    <dl class="detail-list">
+      <dt>Name</dt>
+      <dd>
+        <a href="{% url 'crm:client_detail' project.client.pk %}">
+          {{ project.client.first_name }} {{ project.client.last_name }}
+        </a>
+      </dd>
+      <dt>Site Address</dt>
+      <dd>{{ project.client.site_address|linebreaksbr }}</dd>
+    </dl>
+  </section>
+
+  <section class="card">
+    <h2>Contract</h2>
+    <dl class="detail-list">
+      <dt>Value</dt>
+      <dd>{% if project.contract_value %}${{ project.contract_value }}{% else %}—{% endif %}</dd>
+      <dt>Signed</dt>
+      <dd>{{ project.contract_signed_date|date:"d M Y"|default:"—" }}</dd>
+      <dt>Sales Rep</dt>
+      <dd>
+        {% if project.sales_rep %}
+          {{ project.sales_rep.first_name }} {{ project.sales_rep.last_name }}
+        {% else %}
+          —
+        {% endif %}
+      </dd>
+    </dl>
+  </section>
+</div>
+
+<section class="card">
+  <h2>Stage Progress</h2>
+  <div class="stage-board">
+    {% for progress in stages %}
+      <article class="stage-card">
+        <header class="stage-card-header">
+          <strong>{{ progress.stage.sequence_order }}. {{ progress.stage.display_name }}</strong>
+          <span class="badge badge-{{ progress.status }}">{{ progress.get_status_display }}</span>
+        </header>
+        {% if progress.stage.typical_duration_days %}
+          <p class="pipeline-card-meta">Typical: {{ progress.stage.typical_duration_days }} day{{ progress.stage.typical_duration_days|pluralize }}</p>
+        {% endif %}
+
+        <form method="post" action="{% url 'construction:project_update_stage' project.pk progress.pk %}" class="stage-form">
+          {% csrf_token %}
+          <label>
+            Status
+            <select name="status">
+              {% for value, label in stage_status_choices %}
+                <option value="{{ value }}" {% if progress.status == value %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+          </label>
+          <div class="stage-dates">
+            <label>
+              Planned start
+              <input type="date" name="planned_start_date" value="{{ progress.planned_start_date|date:'Y-m-d' }}">
+            </label>
+            <label>
+              Planned end
+              <input type="date" name="planned_end_date" value="{{ progress.planned_end_date|date:'Y-m-d' }}">
+            </label>
+            <label>
+              Actual start
+              <input type="date" name="actual_start_date" value="{{ progress.actual_start_date|date:'Y-m-d' }}">
+            </label>
+            <label>
+              Actual end
+              <input type="date" name="actual_end_date" value="{{ progress.actual_end_date|date:'Y-m-d' }}">
+            </label>
+          </div>
+          <button type="submit" class="btn">Save stage</button>
+        </form>
+      </article>
+    {% empty %}
+      <p class="notes">No construction stages have been seeded yet. Run migrations to load the standard stages.</p>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="card">
+  <h2>Trade Partners</h2>
+  {% if partners %}
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Company</th>
+            <th>Trade Role</th>
+            <th>Agreed Price</th>
+            <th>Contact</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for assignment in partners %}
+            <tr>
+              <td>{{ assignment.partner.company_name }}</td>
+              <td>{{ assignment.trade_role|default:"—" }}</td>
+              <td>{% if assignment.agreed_price %}${{ assignment.agreed_price }}{% else %}—{% endif %}</td>
+              <td>{{ assignment.partner.contact_name|default:"—" }} · {{ assignment.partner.contact_phone|default:"—" }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="notes">No partners assigned yet.</p>
+  {% endif %}
+
+  <form method="post" action="{% url 'construction:project_add_partner' project.pk %}" class="inline-form">
+    {% csrf_token %}
+    <h3>Assign a partner</h3>
+    <div class="form-grid">
+      {% for field in partner_form %}
+        <div class="form-field">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+        </div>
+      {% endfor %}
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Assign Partner</button>
+    </div>
+  </form>
+</section>
+
+<section class="card">
+  <h2>Site Updates</h2>
+  <form method="post" action="{% url 'construction:project_add_update' project.pk %}" class="inline-form">
+    {% csrf_token %}
+    <div class="form-grid">
+      {% for field in update_form %}
+        <div class="form-field">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+        </div>
+      {% endfor %}
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Post Update</button>
+    </div>
+  </form>
+
+  {% if updates %}
+    <ul class="update-list">
+      {% for entry in updates %}
+        <li class="update-item">
+          <p class="update-meta">
+            {{ entry.created_at|date:"d M Y, g:i a" }}
+            {% if entry.posted_by %}
+              · {{ entry.posted_by.first_name }} {{ entry.posted_by.last_name }}
+            {% endif %}
+          </p>
+          {% if entry.update_text %}
+            <p class="notes">{{ entry.update_text|linebreaksbr }}</p>
+          {% endif %}
+          {% if entry.photo_url %}
+            <p><a href="{{ entry.photo_url }}" target="_blank" rel="noopener">View photo</a></p>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="notes">No site updates yet.</p>
+  {% endif %}
+</section>
+{% endblock %}

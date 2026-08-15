@@ -25,4 +25,5 @@ urlpatterns = [
     path('', RedirectView.as_view(pattern_name='crm:lead_list', permanent=False)),
     path('admin/', admin.site.urls),
     path('', include('crm.urls')),
+    path('', include('construction.urls')),
 ]
