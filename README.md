@@ -144,6 +144,8 @@ Press `Ctrl+C` in the terminal to stop the server.
 
 ## Roadmap
 
+**Current status:** Phases 0–3 are complete. Next up is **Phase 4 — Reporting dashboard**.
+
 ### Phase 0 — Design & database ✅
 
 - [x] 3NF schema (10 tables)
