@@ -3,8 +3,8 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_http_methods
 
-from .forms import ConvertToClientForm, LeadForm
-from .models import Lead
+from .forms import ClientForm, ConvertToClientForm, LeadForm
+from .models import Client, Lead
 
 
 def lead_list(request):
@@ -140,7 +140,7 @@ def lead_convert_to_client(request, pk):
                 request,
                 f'Client "{client.first_name} {client.last_name}" created from lead.',
             )
-            return redirect('crm:lead_detail', pk=lead.pk)
+            return redirect('crm:client_detail', pk=client.pk)
     else:
         form = ConvertToClientForm()
 
@@ -150,5 +150,146 @@ def lead_convert_to_client(request, pk):
         {
             'lead': lead,
             'form': form,
+        },
+    )
+
+
+def lead_pipeline(request):
+    all_leads = list(
+        Lead.objects.select_related('assigned_sales').order_by('-created_at')
+    )
+
+    columns = [
+        {
+            'value': choice.value,
+            'label': choice.label,
+            'leads': [lead for lead in all_leads if lead.status == choice.value],
+        }
+        for choice in Lead.Status
+    ]
+
+    return render(
+        request,
+        'crm/lead_pipeline.html',
+        {
+            'columns': columns,
+            'total_count': len(all_leads),
+            'status_choices': Lead.Status.choices,
+        },
+    )
+
+
+@require_http_methods(['POST'])
+def lead_update_status(request, pk):
+    lead = get_object_or_404(Lead, pk=pk)
+    new_status = request.POST.get('status', '')
+
+    if new_status not in Lead.Status.values:
+        messages.error(request, 'Invalid status selected.')
+    elif new_status == lead.status:
+        messages.info(request, 'Lead status unchanged.')
+    else:
+        old_label = lead.get_status_display()
+        lead.status = new_status
+        lead.save(update_fields=['status'])
+        messages.success(
+            request,
+            f'Lead moved from {old_label} to {lead.get_status_display()}.',
+        )
+
+    next_url = request.POST.get('next', '')
+    if next_url == 'list':
+        return redirect('crm:lead_list')
+    return redirect('crm:lead_pipeline')
+
+
+def client_list(request):
+    search = request.GET.get('q', '').strip()
+
+    clients = Client.objects.select_related('lead')
+
+    if search:
+        clients = clients.filter(
+            Q(first_name__icontains=search)
+            | Q(last_name__icontains=search)
+            | Q(email__icontains=search)
+            | Q(phone__icontains=search)
+            | Q(mobile__icontains=search)
+            | Q(site_address__icontains=search)
+        )
+
+    total_count = Client.objects.count()
+
+    return render(
+        request,
+        'crm/client_list.html',
+        {
+            'clients': clients,
+            'search_query': search,
+            'total_count': total_count,
+        },
+    )
+
+
+def client_detail(request, pk):
+    client = get_object_or_404(
+        Client.objects.select_related('lead'),
+        pk=pk,
+    )
+    projects = client.projects.select_related('sales_rep').all()
+
+    return render(
+        request,
+        'crm/client_detail.html',
+        {
+            'client': client,
+            'projects': projects,
+        },
+    )
+
+
+@require_http_methods(['GET', 'POST'])
+def client_create(request):
+    if request.method == 'POST':
+        form = ClientForm(request.POST)
+        if form.is_valid():
+            client = form.save()
+            messages.success(request, f'Client "{client.first_name} {client.last_name}" created.')
+            return redirect('crm:client_detail', pk=client.pk)
+    else:
+        form = ClientForm()
+
+    return render(
+        request,
+        'crm/client_form.html',
+        {
+            'form': form,
+            'title': 'New Client',
+            'submit_label': 'Create Client',
+        },
+    )
+
+
+@require_http_methods(['GET', 'POST'])
+def client_edit(request, pk):
+    client = get_object_or_404(Client, pk=pk)
+
+    if request.method == 'POST':
+        form = ClientForm(request.POST, instance=client)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Client updated.')
+            return redirect('crm:client_detail', pk=client.pk)
+    else:
+        form = ClientForm(instance=client)
+
+    return render(
+        request,
+        'crm/client_form.html',
+        {
+            'form': form,
+            'client': client,
+            'title': f'Edit Client — {client.first_name} {client.last_name}',
+            'submit_label': 'Save Changes',
         },
     )

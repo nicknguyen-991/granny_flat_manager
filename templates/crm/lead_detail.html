@@ -68,7 +68,7 @@
         <li>
           {{ client.first_name }} {{ client.last_name }}
           — {{ client.site_address|truncatechars:60 }}
-          <a href="/admin/crm/client/{{ client.pk }}/change/" target="_blank" rel="noopener">View in Admin</a>
+          <a href="{% url 'crm:client_detail' client.pk %}">View client</a>
         </li>
       {% endfor %}
     </ul>

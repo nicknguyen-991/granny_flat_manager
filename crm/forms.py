@@ -22,6 +22,23 @@ class LeadForm(forms.ModelForm):
         }
 
 
+class ClientForm(forms.ModelForm):
+    class Meta:
+        model = Client
+        fields = [
+            'lead',
+            'first_name',
+            'last_name',
+            'phone',
+            'mobile',
+            'email',
+            'site_address',
+        ]
+        widgets = {
+            'site_address': forms.Textarea(attrs={'rows': 3}),
+        }
+
+
 class ConvertToClientForm(forms.ModelForm):
     class Meta:
         model = Client

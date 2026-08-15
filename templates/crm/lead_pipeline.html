@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block container_class %}container-wide{% endblock %}
+{% block title %}Sales Pipeline — Granny Flat Manager{% endblock %}
+
+{% block content %}
+<section class="page-header">
+  <div>
+    <h1>Sales Pipeline</h1>
+    <p class="subtitle">{{ total_count }} lead{{ total_count|pluralize }} across all stages</p>
+  </div>
+  <div class="btn-group">
+    <a class="btn" href="{% url 'crm:lead_list' %}">Table view</a>
+    <a class="btn btn-primary" href="{% url 'crm:lead_create' %}">+ New Lead</a>
+  </div>
+</section>
+
+<div class="pipeline-board">
+  {% for column in columns %}
+    <section class="pipeline-column">
+      <header class="pipeline-column-header">
+        <span class="badge badge-{{ column.value }}">{{ column.label }}</span>
+        <span class="pipeline-count">{{ column.leads|length }}</span>
+      </header>
+
+      <div class="pipeline-cards">
+        {% for lead in column.leads %}
+          <article class="pipeline-card">
+            <a class="pipeline-card-title" href="{% url 'crm:lead_detail' lead.pk %}">
+              {{ lead.first_name }} {{ lead.last_name }}
+            </a>
+            {% if lead.get_source_display %}
+              <p class="pipeline-card-meta">{{ lead.get_source_display }}</p>
+            {% endif %}
+            {% if lead.assigned_sales %}
+              <p class="pipeline-card-meta">
+                {{ lead.assigned_sales.first_name }} {{ lead.assigned_sales.last_name }}
+              </p>
+            {% endif %}
+            <p class="pipeline-card-date">{{ lead.created_at|date:"d M Y" }}</p>
+
+            <form class="pipeline-move-form" method="post" action="{% url 'crm:lead_update_status' lead.pk %}">
+              {% csrf_token %}
+              <input type="hidden" name="next" value="pipeline">
+              <label class="sr-only" for="status-{{ lead.pk }}">Move lead</label>
+              <select id="status-{{ lead.pk }}" name="status" onchange="this.form.submit()">
+                {% for value, label in status_choices %}
+                  <option value="{{ value }}" {% if lead.status == value %}selected{% endif %}>
+                    {{ label }}
+                  </option>
+                {% endfor %}
+              </select>
+            </form>
+          </article>
+        {% empty %}
+          <p class="pipeline-empty">No leads</p>
+        {% endfor %}
+      </div>
+    </section>
+  {% endfor %}
+</div>
+{% endblock %}
