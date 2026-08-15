@@ -41,6 +41,10 @@ a:hover {
   margin: 0 auto;
 }
 
+.container-wide {
+  width: min(1400px, 96vw);
+}
+
 .site-header {
   background: var(--surface);
   border-bottom: 1px solid var(--border);
@@ -391,8 +395,121 @@ a:hover {
   color: var(--danger);
 }
 
+.message-info {
+  background: #eef4ff;
+  color: var(--primary);
+}
+
 .preview-card {
   max-width: 520px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+.pipeline-board {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  align-items: flex-start;
+}
+
+.pipeline-column {
+  flex: 0 0 240px;
+  background: #eef1f5;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  max-height: calc(100vh - 220px);
+  display: flex;
+  flex-direction: column;
+}
+
+.pipeline-column-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+
+.pipeline-count {
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.pipeline-cards {
+  padding: 0.75rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  flex: 1;
+}
+
+.pipeline-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.75rem;
+  box-shadow: var(--shadow);
+}
+
+.pipeline-card-title {
+  font-weight: 600;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.pipeline-card-title:hover {
+  color: var(--primary);
+  text-decoration: underline;
+}
+
+.pipeline-card-meta,
+.pipeline-card-date {
+  margin: 0.25rem 0 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.pipeline-card-date {
+  margin-top: 0.5rem;
+}
+
+.pipeline-move-form {
+  margin-top: 0.65rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid var(--border);
+}
+
+.pipeline-move-form select {
+  width: 100%;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font: inherit;
+  font-size: 0.85rem;
+  background: var(--surface);
+}
+
+.pipeline-empty {
+  margin: 0;
+  padding: 1rem 0.5rem;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.9rem;
 }
 
 @media (max-width: 640px) {

@@ -13,12 +13,14 @@
       <a class="brand" href="{% url 'crm:lead_list' %}">Granny Flat Manager</a>
       <nav class="main-nav">
         <a href="{% url 'crm:lead_list' %}" class="{% if request.resolver_match.url_name == 'lead_list' %}active{% endif %}">Leads</a>
+        <a href="{% url 'crm:lead_pipeline' %}" class="{% if request.resolver_match.url_name == 'lead_pipeline' %}active{% endif %}">Pipeline</a>
+        <a href="{% url 'crm:client_list' %}" class="{% if 'client' in request.resolver_match.url_name %}active{% endif %}">Clients</a>
         <a href="/admin/" target="_blank" rel="noopener">Admin</a>
       </nav>
     </div>
   </header>
 
-  <main class="container main-content">
+  <main class="container {% block container_class %}{% endblock %} main-content">
     {% if messages %}
       <ul class="messages">
         {% for message in messages %}

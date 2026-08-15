@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}{{ client.first_name }} {{ client.last_name }} — Granny Flat Manager{% endblock %}
+
+{% block content %}
+<p class="breadcrumb"><a href="{% url 'crm:client_list' %}">Clients</a> / {{ client.first_name }} {{ client.last_name }}</p>
+
+<section class="page-header">
+  <div>
+    <h1>{{ client.first_name }} {{ client.last_name }}</h1>
+    <p class="subtitle">Created {{ client.created_at|date:"d M Y, g:i a" }}</p>
+  </div>
+  <div class="btn-group">
+    <a class="btn" href="{% url 'crm:client_edit' client.pk %}">Edit</a>
+  </div>
+</section>
+
+<div class="detail-grid">
+  <section class="card">
+    <h2>Contact</h2>
+    <dl class="detail-list">
+      <dt>Email</dt>
+      <dd>{{ client.email|default:"—" }}</dd>
+      <dt>Phone</dt>
+      <dd>{{ client.phone|default:"—" }}</dd>
+      <dt>Mobile</dt>
+      <dd>{{ client.mobile|default:"—" }}</dd>
+    </dl>
+  </section>
+
+  <section class="card">
+    <h2>Site &amp; Origin</h2>
+    <dl class="detail-list">
+      <dt>Site Address</dt>
+      <dd>{{ client.site_address|linebreaksbr }}</dd>
+      <dt>Converted from Lead</dt>
+      <dd>
+        {% if client.lead %}
+          <a href="{% url 'crm:lead_detail' client.lead.pk %}">
+            {{ client.lead.first_name }} {{ client.lead.last_name }}
+          </a>
+        {% else %}
+          —
+        {% endif %}
+      </dd>
+    </dl>
+  </section>
+</div>
+
+<section class="card">
+  <h2>Projects</h2>
+  {% if projects %}
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Status</th>
+            <th>Contract Value</th>
+            <th>Sales Rep</th>
+            <th>Signed</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for project in projects %}
+            <tr>
+              <td>#{{ project.pk }}</td>
+              <td><span class="badge">{{ project.get_status_display }}</span></td>
+              <td>{% if project.contract_value %}${{ project.contract_value }}{% else %}—{% endif %}</td>
+              <td>
+                {% if project.sales_rep %}
+                  {{ project.sales_rep.first_name }} {{ project.sales_rep.last_name }}
+                {% else %}
+                  —
+                {% endif %}
+              </td>
+              <td>{{ project.contract_signed_date|date:"d M Y"|default:"—" }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <p class="field-help">Manage projects in <a href="/admin/construction/project/" target="_blank" rel="noopener">Admin</a> until Phase 3 pages are built.</p>
+  {% else %}
+    <p class="notes">No projects yet for this client.</p>
+  {% endif %}
+</section>
+{% endblock %}

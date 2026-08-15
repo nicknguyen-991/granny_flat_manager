@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Clients — Granny Flat Manager{% endblock %}
+
+{% block content %}
+<section class="page-header">
+  <div>
+    <h1>Clients</h1>
+    <p class="subtitle">{{ total_count }} total client{{ total_count|pluralize }}</p>
+  </div>
+  <a class="btn btn-primary" href="{% url 'crm:client_create' %}">+ New Client</a>
+</section>
+
+<form class="filters" method="get" action="{% url 'crm:client_list' %}">
+  <div class="search-row">
+    <input type="search" name="q" value="{{ search_query }}" placeholder="Search name, email, phone, site address…">
+    <button type="submit" class="btn">Search</button>
+    {% if search_query %}
+      <a class="btn btn-ghost" href="{% url 'crm:client_list' %}">Clear</a>
+    {% endif %}
+  </div>
+</form>
+
+{% if clients %}
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Site Address</th>
+          <th>Phone</th>
+          <th>Mobile</th>
+          <th>Email</th>
+          <th>From Lead</th>
+          <th>Created</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for client in clients %}
+          <tr class="clickable-row" onclick="window.location='{% url 'crm:client_detail' client.pk %}'">
+            <td><strong>{{ client.first_name }} {{ client.last_name }}</strong></td>
+            <td>{{ client.site_address|truncatechars:50 }}</td>
+            <td>{{ client.phone|default:"—" }}</td>
+            <td>{{ client.mobile|default:"—" }}</td>
+            <td>{{ client.email|default:"—" }}</td>
+            <td>
+              {% if client.lead %}
+                <a href="{% url 'crm:lead_detail' client.lead.pk %}" onclick="event.stopPropagation()">
+                  {{ client.lead.first_name }} {{ client.lead.last_name }}
+                </a>
+              {% else %}
+                —
+              {% endif %}
+            </td>
+            <td>{{ client.created_at|date:"d M Y" }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% else %}
+  <div class="empty-state">
+    <p>No clients found{% if search_query %} matching your search{% endif %}.</p>
+    <a class="btn btn-primary" href="{% url 'crm:client_create' %}">Create your first client</a>
+  </div>
+{% endif %}
+{% endblock %}
