@@ -132,7 +132,10 @@ Then open in your browser:
 | URL | Page |
 |-----|------|
 | [http://127.0.0.1:8000/](http://127.0.0.1:8000/) | Redirects to Leads |
-| [http://127.0.0.1:8000/leads/](http://127.0.0.1:8000/leads/) | CRM — Lead list |
+| [http://127.0.0.1:8000/leads/](http://127.0.0.1:8000/leads/) | CRM — Lead list (table view) |
+| [http://127.0.0.1:8000/leads/pipeline/](http://127.0.0.1:8000/leads/pipeline/) | CRM — Sales pipeline (Kanban) |
+| [http://127.0.0.1:8000/clients/](http://127.0.0.1:8000/clients/) | CRM — Client list |
+| [http://127.0.0.1:8000/projects/](http://127.0.0.1:8000/projects/) | Construction — Project list |
 | [http://127.0.0.1:8000/admin/](http://127.0.0.1:8000/admin/) | Django Admin |
 
 Press `Ctrl+C` in the terminal to stop the server.
@@ -140,6 +143,8 @@ Press `Ctrl+C` in the terminal to stop the server.
 ---
 
 ## Roadmap
+
+**Current status:** Phases 0–3 are complete. Next up is **Phase 4 — Reporting dashboard**.
 
 ### Phase 0 — Design & database ✅
 
@@ -156,22 +161,22 @@ Press `Ctrl+C` in the terminal to stop the server.
 - [x] Django Admin for all models
 - [x] Admin UX polish (column autofit, row links, sidebar ordering)
 
-### Phase 2 — Sales CRM 🔄 In progress
+### Phase 2 — Sales CRM ✅
 
 - [x] Lead list with status filter and search
 - [x] Lead detail, create, edit
 - [x] Convert won lead → client
-- [ ] Client list and detail pages
-- [ ] Pipeline / Kanban view
+- [x] Client list, detail, create, and edit pages
+- [x] Sales pipeline / Kanban view with in-board status updates
 
-### Phase 3 — Construction tracking ⬜ Planned
+### Phase 3 — Construction tracking ✅
 
-- [ ] Project list and detail pages
-- [ ] Stage progress board
-- [ ] Assign partners to projects
-- [ ] Site updates (notes / photos)
+- [x] Project list and detail pages
+- [x] Stage progress board
+- [x] Assign partners to projects
+- [x] Site updates (notes / photos)
 
-### Phase 4 — Reporting dashboard ⬜ Planned
+### Phase 4 — Reporting dashboard 🔄 Next
 
 - [ ] Lead conversion by sales rep
 - [ ] Jobs in progress
