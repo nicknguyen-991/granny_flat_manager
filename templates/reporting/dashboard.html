@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block title %}Reports — Granny Flat Manager{% endblock %}
+
+{% block content %}
+<section class="page-header">
+  <div>
+    <h1>Reports</h1>
+    <p class="subtitle">Sales conversion, jobs in progress, revenue, and commissions</p>
+  </div>
+</section>
+
+<section class="stat-grid">
+  <article class="stat-card">
+    <p class="stat-label">Leads</p>
+    <p class="stat-value">{{ total_leads }}</p>
+    <p class="stat-meta">{{ won_leads }} won · {{ lost_leads }} lost</p>
+  </article>
+  <article class="stat-card">
+    <p class="stat-label">Conversion rate</p>
+    <p class="stat-value">{{ conversion_pct|floatformat:1 }}%</p>
+    <p class="stat-meta">Won leads / all leads</p>
+  </article>
+  <article class="stat-card">
+    <p class="stat-label">Jobs in progress</p>
+    <p class="stat-value">{{ jobs_count }}</p>
+    <p class="stat-meta">Active construction jobs</p>
+  </article>
+  <article class="stat-card">
+    <p class="stat-label">Contract revenue</p>
+    <p class="stat-value">${{ revenue_total|floatformat:2 }}</p>
+    <p class="stat-meta">All project contract values</p>
+  </article>
+  <article class="stat-card">
+    <p class="stat-label">Commissions unpaid</p>
+    <p class="stat-value">${{ commission_unpaid|floatformat:2 }}</p>
+    <p class="stat-meta">${{ commission_paid|floatformat:2 }} paid of ${{ commission_total|floatformat:2 }}</p>
+  </article>
+</section>
+
+<section class="card">
+  <h2>Lead conversion by sales rep</h2>
+  {% if sales_rows or unassigned_leads %}
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Sales rep</th>
+            <th>Total leads</th>
+            <th>Won</th>
+            <th>Lost</th>
+            <th>Conversion</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in sales_rows %}
+            <tr>
+              <td>{{ row.first_name }} {{ row.last_name }}</td>
+              <td>{{ row.total_leads }}</td>
+              <td>{{ row.won_leads }}</td>
+              <td>{{ row.lost_leads }}</td>
+              <td>{{ row.conversion_pct|floatformat:1 }}%</td>
+            </tr>
+          {% endfor %}
+          {% if unassigned_leads %}
+            <tr>
+              <td>Unassigned</td>
+              <td>{{ unassigned_leads }}</td>
+              <td>{{ unassigned_won }}</td>
+              <td>—</td>
+              <td>{{ unassigned_pct|floatformat:1 }}%</td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="notes">No leads yet. Conversion rates will appear after sales reps are assigned.</p>
+  {% endif %}
+</section>
+
+<section class="card">
+  <h2>Jobs in progress</h2>
+  {% if jobs_in_progress %}
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Project</th>
+            <th>Client</th>
+            <th>Current stage</th>
+            <th>Stage progress</th>
+            <th>Contract value</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for job in jobs_in_progress %}
+            <tr class="clickable-row" onclick="window.location='{% url 'construction:project_detail' job.project.pk %}'">
+              <td><strong>#{{ job.project.pk }}</strong></td>
+              <td>{{ job.project.client.first_name }} {{ job.project.client.last_name }}</td>
+              <td>
+                {% if job.current_stage %}
+                  <span class="badge badge-{{ job.current_stage.status }}">{{ job.current_stage.stage.display_name }}</span>
+                {% else %}
+                  —
+                {% endif %}
+              </td>
+              <td>{{ job.completed_count }} / {{ job.stage_count }} complete</td>
+              <td>{% if job.project.contract_value %}${{ job.project.contract_value }}{% else %}—{% endif %}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="notes">No projects are marked In progress. Set a project status on the Projects page to see it here.</p>
+  {% endif %}
+</section>
+
+<section class="card">
+  <h2>Revenue overview</h2>
+  {% if revenue_total %}
+    <ul class="revenue-bars">
+      {% for row in revenue_by_status %}
+        <li>
+          <div class="revenue-bar-label">
+            <span>{{ row.label }} ({{ row.count }})</span>
+            <strong>${{ row.amount|floatformat:2 }}</strong>
+          </div>
+          <div class="revenue-bar-track">
+            <div class="revenue-bar-fill badge-{{ row.value }}" style="width: {{ row.bar_pct|floatformat:0 }}%;"></div>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="notes">No contract values recorded yet.</p>
+  {% endif %}
+</section>
+
+<section class="card">
+  <h2>Commission summary</h2>
+  {% if commission_rows %}
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Sales rep</th>
+            <th>Total</th>
+            <th>Paid</th>
+            <th>Unpaid</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in commission_rows %}
+            <tr>
+              <td>{{ row.first_name }} {{ row.last_name }}</td>
+              <td>${{ row.commission_total|floatformat:2 }}</td>
+              <td>${{ row.commission_paid|floatformat:2 }}</td>
+              <td>${{ row.commission_unpaid|floatformat:2 }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="notes">No commissions recorded yet. Add them in Admin under CRM → Commissions.</p>
+  {% endif %}
+</section>
+{% endblock %}

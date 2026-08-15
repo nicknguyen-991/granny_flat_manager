@@ -72,8 +72,12 @@ class ProjectStage(models.Model):
         db_table = 'project_stages'
         ordering = ['sequence_order']
 
+    @property
+    def display_name(self):
+        return self.stage_name.replace('_', ' ').title()
+
     def __str__(self):
-        return f'{self.sequence_order}. {self.stage_name}'
+        return f'{self.sequence_order}. {self.display_name}'
 
 
 class ProjectStageProgress(models.Model):

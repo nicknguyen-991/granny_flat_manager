@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Projects — Granny Flat Manager{% endblock %}
+
+{% block content %}
+<section class="page-header">
+  <div>
+    <h1>Projects</h1>
+    <p class="subtitle">{{ total_count }} total project{{ total_count|pluralize }}</p>
+  </div>
+  <a class="btn btn-primary" href="{% url 'construction:project_create' %}">+ New Project</a>
+</section>
+
+<form class="filters" method="get" action="{% url 'construction:project_list' %}">
+  <div class="status-tabs">
+    <a href="{% url 'construction:project_list' %}{% if search_query %}?q={{ search_query|urlencode }}{% endif %}"
+       class="status-tab {% if not status_filter %}active{% endif %}">
+      All <span class="count">{{ total_count }}</span>
+    </a>
+    {% for tab in status_tabs %}
+      <a href="?status={{ tab.value }}{% if search_query %}&q={{ search_query|urlencode }}{% endif %}"
+         class="status-tab {% if status_filter == tab.value %}active{% endif %}">
+        {{ tab.label }} <span class="count">{{ tab.count }}</span>
+      </a>
+    {% endfor %}
+  </div>
+
+  <div class="search-row">
+    <input type="search" name="q" value="{{ search_query }}" placeholder="Search client name or site address…">
+    {% if status_filter %}
+      <input type="hidden" name="status" value="{{ status_filter }}">
+    {% endif %}
+    <button type="submit" class="btn">Search</button>
+    {% if search_query or status_filter %}
+      <a class="btn btn-ghost" href="{% url 'construction:project_list' %}">Clear</a>
+    {% endif %}
+  </div>
+</form>
+
+{% if projects %}
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Project</th>
+          <th>Client</th>
+          <th>Status</th>
+          <th>Contract Value</th>
+          <th>Sales Rep</th>
+          <th>Signed</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for project in projects %}
+          <tr class="clickable-row" onclick="window.location='{% url 'construction:project_detail' project.pk %}'">
+            <td><strong>#{{ project.pk }}</strong></td>
+            <td>{{ project.client.first_name }} {{ project.client.last_name }}</td>
+            <td><span class="badge badge-{{ project.status }}">{{ project.get_status_display }}</span></td>
+            <td>{% if project.contract_value %}${{ project.contract_value }}{% else %}—{% endif %}</td>
+            <td>
+              {% if project.sales_rep %}
+                {{ project.sales_rep.first_name }} {{ project.sales_rep.last_name }}
+              {% else %}
+                —
+              {% endif %}
+            </td>
+            <td>{{ project.contract_signed_date|date:"d M Y"|default:"—" }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% else %}
+  <div class="empty-state">
+    <p>No projects found{% if status_filter or search_query %} matching your filters{% endif %}.</p>
+    <a class="btn btn-primary" href="{% url 'construction:project_create' %}">Create your first project</a>
+  </div>
+{% endif %}
+{% endblock %}
